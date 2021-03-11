@@ -37,9 +37,14 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
     xhr.onreadystatechange = function () {
         if (xhr.readyState==4) {
             try {
+                
                 if (xhr.status==200) {
+                    var xhr_response = JSON.parse(xhr.response);
                     //XXX: parse some JSON from the request!
                     //XXX: Pass the data to the callback!
+                    if (callback){
+                        callback(xhr_response);
+                    }
                 }
             } 
             catch(e) {
@@ -50,12 +55,19 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
     //XXX: POST to a URL
     //XXX: set the mimetype and the accept headers!
     // Remember to use application/json !
+    xhr.open("POST", url);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.setRequestHeader('Accept','application/json');
+    xhr.send(JSON.stringify(objects));
+
+
 }
 
 
 world = {};
 
 //XXX: TODO Make this prettier!
+//code of smiling face referenced from https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes
 function drawCircle(context,entity) {
     with(context) {
         beginPath();              
@@ -65,9 +77,19 @@ function drawCircle(context,entity) {
         //moveTo(x,y);
         fillStyle = entity["colour"];
         strokeStyle = fillStyle;
-        arc(x, y, (entity["radius"])?entity["radius"]:50, 0, 2.0 * Math.PI, false);  
+        //(75,75)
+        arc(x, y, (entity["radius"])?entity["radius"]:50, 0, 2.0 * Math.PI, false); 
+        moveTo(x+35, y);
+        arc(x, y, 35, 0, Math.PI, false);
+        moveTo(x-10, y-10);
+        arc(x-15, y-10, 5, 0, Math.PI * 2, true);  // Left eye
+        moveTo(x+20, y-10);
+        arc(x+20, y-10, 5, 0, Math.PI * 2, true);
+        
         stroke();                                
     }
+
+
 }
 
 function prepEntity(entity) {
@@ -136,7 +158,15 @@ function getPosition(e) {
 
 function addEntity(entity, data) {
     world[entity] = data;
-    drawNextFrame(); // (but should we?)
+    drawNextFrame(); 
+    var send_url = "/entity/"+entity;
+    sendJSONXMLHTTPRequest(send_url,data,function(respo){
+        console.log(respo)
+        drawNextFrame(); 
+        
+    });
+
+    // (but should we?)
     //XXX: Send a XHTML Request that updates the entity you just  modified!
 
 }
@@ -255,7 +285,8 @@ mouse.mouseuppers.push(function(x,y,clicked,e) {
 });
 
 mouse.mousedraggers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'green',
+    color = random_pick_color();
+    addEntityWithoutName({'x':x,'y':y,'colour':color,
                           'radius':10});
 });
 
@@ -263,6 +294,15 @@ mouse.mousedraggers.push(function(x,y,clicked,e) {
 function update() {
     //XXX: TODO Get the world from the webservice using a XMLHTTPRequest
     drawFrame();
+}
+
+function random_pick_color(){
+    var color_list = ['yellow','cyan','magenta','teal','purple']
+    var init_index = Math.random()*(color_list.length-1);
+    var round_index = Math.round(init_index);
+    return color_list[round_index];
+
+
 }
 
 // 30 frames per second
