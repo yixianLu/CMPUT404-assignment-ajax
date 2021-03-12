@@ -101,7 +101,7 @@ def clear():
     '''Clear the world out!'''
     myWorld.clear()
     data_as_str = json.dumps(myWorld.world())
-    return Response(response=data_as_str,status=200)
+    return Response(response=data_as_str,status=200,mimetype="application/json")
 
 if __name__ == "__main__":
     app.run()

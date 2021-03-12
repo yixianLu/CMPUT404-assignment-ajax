@@ -161,7 +161,7 @@ function addEntity(entity, data) {
     drawNextFrame(); 
     var send_url = "/entity/"+entity;
     sendJSONXMLHTTPRequest(send_url,data,function(respo){
-        console.log(respo)
+        // console.log(respo);
         drawNextFrame(); 
         
     });
@@ -294,7 +294,17 @@ mouse.mousedraggers.push(function(x,y,clicked,e) {
 function update() {
     //XXX: TODO Get the world from the webservice using a XMLHTTPRequest
     drawFrame();
+    send_url = "/world"
+    var res =   sendJSONXMLHTTPRequest(send_url,null,function(new_world){
+        if(new_world!=world){
+            world=new_world;
+            drawNextFrame();
+        }
+    });
+    drawFrame();
 }
+
+
 
 function random_pick_color(){
     var color_list = ['yellow','cyan','magenta','teal','purple']
