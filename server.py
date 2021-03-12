@@ -103,5 +103,6 @@ def clear():
     data_as_str = json.dumps(myWorld.world())
     return Response(response=data_as_str,status=200,mimetype="application/json")
 
+
 if __name__ == "__main__":
     app.run()

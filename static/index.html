@@ -296,12 +296,14 @@ function update() {
     drawFrame();
     send_url = "/world"
     var res =   sendJSONXMLHTTPRequest(send_url,null,function(new_world){
-        if(new_world!=world){
+        console.log(JSON.stringify(world) != JSON.stringify(new_world));
+        if(JSON.stringify(world) != JSON.stringify(new_world) ){
             world=new_world;
             drawNextFrame();
         }
+        drawFrame();    
     });
-    drawFrame();
+    
 }
 
 
